@@ -1,2 +1,2 @@
 # IntelliCards
-Flashcard Generation through AI
+Flashcard Generation through AI - Backend
