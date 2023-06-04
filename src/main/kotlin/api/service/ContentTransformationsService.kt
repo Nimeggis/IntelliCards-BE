@@ -1,10 +1,11 @@
-package api.transform
+package api.service
 
+import org.springframework.stereotype.Service
 import kotlin.math.abs
 
-object ContentTransformations {
+@Service
+class ContentTransformationsService {
 
-    @JvmStatic
     fun filterOutShortPages(contents: MutableMap<Int, List<String>>, minLength: Int = 100): MutableMap<Int, List<String>> {
         var keysToRemove = emptyList<Int>()
         contents.forEach{ entry ->
@@ -20,7 +21,6 @@ object ContentTransformations {
         return contents
     }
 
-    @JvmStatic
     fun filterOutRecurringText(contents: MutableMap<Int, List<String>>,  minLength: Int = 100): MutableMap<Int, List<String>> {
         var keysToRemove = emptyList<Int>()
 

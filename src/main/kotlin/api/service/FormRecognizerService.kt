@@ -1,25 +1,23 @@
-package api.transform
+package api.service
 
-import com.azure.ai.formrecognizer.*
+import api.ApiConfiguration
 import com.azure.ai.formrecognizer.documentanalysis.DocumentAnalysisClient
 import com.azure.ai.formrecognizer.documentanalysis.DocumentAnalysisClientBuilder
 import com.azure.ai.formrecognizer.documentanalysis.models.*
 import com.azure.core.credential.AzureKeyCredential
 import com.azure.core.util.BinaryData
 import com.azure.core.util.polling.SyncPoller
+import org.springframework.stereotype.Service
 import java.io.File
 
-object FormRecognizer {
-    // set `<your-endpoint>` and `<your-key>` variables with the values from the Azure portal
-    private const val endpoint = "https://flashcarddocanalyzer.cognitiveservices.azure.com/"
-    private const val key = "<API key>"
-
+@Service
+class FormRecognizerService(private val config: ApiConfiguration) {
     fun extractTextFromFile(file: File): MutableMap<Int, List<String>> {
 
         // create your `DocumentAnalysisClient` instance and `AzureKeyCredential` variable
         val client: DocumentAnalysisClient = DocumentAnalysisClientBuilder()
-            .credential(AzureKeyCredential(key))
-            .endpoint(endpoint)
+            .credential(AzureKeyCredential(config.formRecognizerKey!!))
+            .endpoint(config.formRecognizerEndpoint)
             .buildClient()
 
         val modelId = "prebuilt-document"

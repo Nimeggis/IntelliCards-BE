@@ -7,6 +7,7 @@ pluginManagement {
         id("org.springframework.boot") version springBootVersion
         kotlin("jvm") version kotlinVersion
         kotlin("plugin.spring") version kotlinVersion
+        kotlin("plugin.serialization") version kotlinVersion
     }
 
     repositories {
