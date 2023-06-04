@@ -6,7 +6,7 @@ import kotlin.math.abs
 @Service
 class ContentTransformationsService {
 
-    fun filterOutShortPages(contents: MutableMap<Int, List<String>>, minLength: Int = 100): MutableMap<Int, List<String>> {
+    fun filterOutShortPages(contents: MutableMap<Int, List<String>>, minLength: Int = 100): Map<Int, List<String>> {
         var keysToRemove = emptyList<Int>()
         contents.forEach{ entry ->
             if(entry.value.joinToString(" ").length < minLength) {
@@ -21,49 +21,29 @@ class ContentTransformationsService {
         return contents
     }
 
-    fun filterOutRecurringText(contents: MutableMap<Int, List<String>>,  minLength: Int = 100): MutableMap<Int, List<String>> {
-        var keysToRemove = emptyList<Int>()
+    fun filterOutRecurringText(contents: MutableMap<Int, List<String>>,  minLength: Int = 100): Map<Int, List<String>> {
+        val keysToRemove = mutableListOf<Int>()
 
-        for (i in 1..3) {
-            val uniqueSentences = mutableSetOf<String>()
-            contents.forEach{ entry ->
-                if(entry.value.size > i) {
-                    uniqueSentences.add(entry.value[i])
-                }
+        repeat(3) {len ->
+            val firstDistinct = contents.values.filter { it.size > len}.map {
+                it[len]
+            }.toSet().size == 1
+            if (firstDistinct) {
+                keysToRemove += len
             }
-
-            if(uniqueSentences.size == 1) {
-                keysToRemove = keysToRemove + i
-            }
-        }
-
-        for (i in -1 downTo -3) {
-            val uniqueSentences = mutableSetOf<String>()
-            for(entry in contents) {
-                if(entry.value.size <= 3 + abs(i)) {
-                    break;
-                }
-                if(entry.value.size >= abs(i)) {
-                    uniqueSentences.add(entry.value[i])
-                }
-            }
-
-            if(uniqueSentences.size == 1) {
-                keysToRemove = keysToRemove + i
+            val lastDistinct = contents.values.filter { it.size > len}.map {
+                it.reversed()[len]
+            }.toSet().size == 1
+            if (lastDistinct) {
+                keysToRemove += -len - 1
             }
         }
 
-        contents.forEach{ entry ->
-            if(entry.value.joinToString(" ").length < minLength) {
-                keysToRemove = keysToRemove + entry.key
+        return contents.mapValues { (_, page) ->
+            page.filterIndexed { i, _ ->
+                !keysToRemove.contains(i) && !keysToRemove.contains(-(page.size - i))
             }
         }
-
-        keysToRemove.forEach { key ->
-            contents.remove(key)
-        }
-
-        return contents
     }
 
 }
