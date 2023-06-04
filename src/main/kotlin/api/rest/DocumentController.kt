@@ -35,6 +35,7 @@ class DocumentController(
 
         val chapter = chapterRepository.findById(id).awaitSingle()
         chapter.flashcards() += flashcards.map { Flashcard(it.question, it.answer) }
+        chapterRepository.save(chapter).awaitSingle()
         println(id)
         println(file.filename())
         return "File Uploaded"
