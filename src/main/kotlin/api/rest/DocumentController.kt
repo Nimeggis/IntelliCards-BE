@@ -4,6 +4,7 @@ import api.model.Flashcard
 import api.repository.ChapterRepository
 import api.repository.FlashcardRepository
 import api.service.ContentTransformationsService
+import api.service.FlashcardDTO
 import api.service.FormRecognizerService
 import api.service.OpenAICompletionService
 import com.azure.core.util.BinaryData
@@ -30,6 +31,26 @@ class DocumentController(
     @Transactional
     @Throws(IOException::class)
     suspend fun uploadFile(@RequestPart("file") file: FilePart, @PathVariable("id") id: String): String {
+        val flashcards = fileToFlashcards(file)
+
+        val chapter = chapterRepository.findById(id).awaitSingle()
+        chapter.flashcards() += flashcards.map { Flashcard(it.question, it.answer) }
+        println(id)
+        println(file.filename())
+        return "File Uploaded"
+    }
+
+    @PostMapping("/file-without-graphql/")
+    @ResponseStatus(HttpStatus.OK)
+    @Transactional
+    @Throws(IOException::class)
+    suspend fun uploadFileWithoutGraphQL(@RequestPart("file") file: FilePart): List<FlashcardDTO> {
+        val flashcards = fileToFlashcards(file)
+
+        return flashcards
+    }
+
+    private fun fileToFlashcards(file: FilePart):List <FlashcardDTO>  {
         val content = file.content()
         val dataBuffer = content.collectList().block()?.reduce { buffer1, buffer2 -> buffer1.write(buffer2) }
         val byteBuffer = dataBuffer!!.toByteBuffer()
@@ -40,11 +61,7 @@ class DocumentController(
         contents = contentTransformationsService.filterOutRecurringText(contents)
         val flashcards = openAICompletionService.generateFlashcard(contents)
 
-        val chapter = chapterRepository.findById(id).awaitSingle()
-        chapter.flashcards() += flashcards.map { Flashcard(it.question, it.answer) }
-        println(id)
-        println(file.filename())
-        return "File Uploaded"
+        return flashcards
     }
 
 }

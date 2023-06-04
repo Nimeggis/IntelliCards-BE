@@ -6,6 +6,7 @@ import com.theokanning.openai.service.OpenAiService
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.springframework.stereotype.Service
+import java.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
@@ -29,7 +30,7 @@ const val maxTries = 10
 @Service
 class OpenAICompletionService(private val config: ApiConfiguration) {
 
-    private val openaiService = OpenAiService(config.openAIKey!!)
+    private val openaiService = OpenAiService(config.openAIKey!!, Duration.ofSeconds(600))
 
     @OptIn(ExperimentalTime::class)
     fun generateFlashcard(document: Map<Int, List<String>>): List<FlashcardDTO> {
