@@ -1,0 +1,9 @@
+FROM gradle:jdk17
+WORKDIR /home/gradle/gropius-backend
+ADD . .
+RUN gradle clean build
+
+FROM eclipse-temurin:17
+WORKDIR /home/java
+COPY --from=0 /home/gradle/gropius-backend/build/libs/*.jar app.jar
+CMD java -jar ./app.jar
