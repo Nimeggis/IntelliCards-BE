@@ -5,6 +5,7 @@ val graphqlJavaVersion: String by project
 val javaVersion: String by project
 
 plugins {
+    id("org.springframework.boot") version "2.7.0"
     kotlin("jvm")
     kotlin("plugin.spring")
     kotlin("plugin.serialization")
