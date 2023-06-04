@@ -32,8 +32,8 @@ class OpenAICompletionService(private val config: ApiConfiguration) {
     private val openaiService = OpenAiService(config.openAIKey!!)
 
     @OptIn(ExperimentalTime::class)
-    fun generateFlashcard(document: List<List<String>>): List<FlashcardDTO> {
-        val res = document.mapIndexed { index, page -> index to page}.parallelStream().map { (index, page) ->
+    fun generateFlashcard(document: Map<Int, List<String>>): List<FlashcardDTO> {
+        val res = document.entries.parallelStream().map { (index, page) ->
             val (flashcards, duration) = measureTimedValue {
                 repeat(maxTries) {
                     val prompt = enPromptPrefix + page.joinToString(" ")
