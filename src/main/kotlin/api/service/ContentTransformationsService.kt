@@ -6,7 +6,7 @@ import kotlin.math.abs
 @Service
 class ContentTransformationsService {
 
-    fun filterOutShortPages(contents: MutableMap<Int, List<String>>, minLength: Int = 100): Map<Int, List<String>> {
+    fun filterOutShortPages(contents: Map<Int, List<String>>, minLength: Int = 100): Map<Int, List<String>> {
         var keysToRemove = emptyList<Int>()
         contents.forEach{ entry ->
             if(entry.value.joinToString(" ").length < minLength) {
@@ -14,14 +14,10 @@ class ContentTransformationsService {
             }
         }
 
-        keysToRemove.forEach { key ->
-            contents.remove(key)
-        }
-
-        return contents
+        return contents.filterKeys { it !in keysToRemove }
     }
 
-    fun filterOutRecurringText(contents: MutableMap<Int, List<String>>,  minLength: Int = 100): Map<Int, List<String>> {
+    fun filterOutRecurringText(contents: Map<Int, List<String>>,  minLength: Int = 100): Map<Int, List<String>> {
         val keysToRemove = mutableListOf<Int>()
 
         repeat(3) {len ->

@@ -32,8 +32,8 @@ class OpenAICompletionService(private val config: ApiConfiguration) {
     private val openaiService = OpenAiService(config.openAIKey!!)
 
     @OptIn(ExperimentalTime::class)
-    fun generateFlashcard(document: List<List<String>>): List<FlashcardDTO> {
-        return document.flatMapIndexed { index, page ->
+    fun generateFlashcard(document: Map<Int, List<String>>): List<FlashcardDTO> {
+        return document.mapValues { (index, page) ->
             val (flashcards, duration) = measureTimedValue {
                 repeat(maxTries) {
                     val prompt = enPromptPrefix + page.joinToString(" ")
@@ -59,7 +59,7 @@ class OpenAICompletionService(private val config: ApiConfiguration) {
                 println("Failed to generate flashcards for page $index")
                 emptyList()
             }
-        }
+        }.values.flatten()
     }
 
     private fun decodeResponse(response: String, page: Int): List<FlashcardDTO>? {

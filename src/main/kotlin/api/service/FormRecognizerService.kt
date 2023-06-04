@@ -12,7 +12,7 @@ import java.io.File
 
 @Service
 class FormRecognizerService(private val config: ApiConfiguration) {
-    fun extractTextFromFile(file: File): MutableMap<Int, List<String>> {
+    fun extractTextFromFile(file: BinaryData): Map<Int, List<String>> {
 
         // create your `DocumentAnalysisClient` instance and `AzureKeyCredential` variable
         val client: DocumentAnalysisClient = DocumentAnalysisClientBuilder()
@@ -22,7 +22,7 @@ class FormRecognizerService(private val config: ApiConfiguration) {
 
         val modelId = "prebuilt-document"
         val analyzeDocumentPoller: SyncPoller<OperationResult, AnalyzeResult> =
-            client.beginAnalyzeDocument(modelId, BinaryData.fromBytes(file.readBytes()))
+            client.beginAnalyzeDocument(modelId, file)
         val analyzeResult: AnalyzeResult = analyzeDocumentPoller.getFinalResult()
 
         val contents = mutableMapOf<Int, List<String>>();
